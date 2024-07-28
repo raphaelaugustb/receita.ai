@@ -1,0 +1,11 @@
+services:
+  postgres:
+    image: postgres:latest
+    environment:
+      - POSTGRES_DB=receitas.ai
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=12345
+    ports:
+      - '5432:5432'
+    expose:
+      - '5432'
