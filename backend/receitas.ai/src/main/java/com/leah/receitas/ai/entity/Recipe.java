@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import java.util.List;
 
-@NoArgsConstructor(force = true)
+@NoArgsConstructor
 @AllArgsConstructor
 @Setter
 @Getter
@@ -16,12 +16,12 @@ import java.util.List;
 public class Recipe {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private final long id;
-    private final String recipeName;
+    private  long id;
+    private  String recipeName;
     @ElementCollection
-    private final List<String> ingredients;
+    private  List<String> ingredients;
     @ElementCollection
-    private final List<String> instructions;
-    private final Boolean isPrivate;
-    private final String usernameRecipe;
+    private  List<String> instructions;
+    private  Boolean isPrivate;
+    private  String usernameRecipe;
 }

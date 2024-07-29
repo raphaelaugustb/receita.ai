@@ -9,25 +9,26 @@ import lombok.Setter;
 import java.util.List;
 import java.util.UUID;
 
+
 @Setter
 @Getter
-@NoArgsConstructor(force = true)
+@NoArgsConstructor
 @AllArgsConstructor
 @Entity
 @Table(name = "user_table")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private final UUID id;
+    private  UUID id;
     @Column(unique = true, nullable = false)
-    private final String username;
-    private final String password;
+    private  String username;
+    private  String password;
     @Column(unique = true, nullable = false)
-    private final String email;
+    private  String email;
     @OneToMany
-    private final List<Recipe> recipeList;
+    private  List<Recipe> recipeList;
     @OneToMany
-    private final List<Recipe> tempRecipeList;
+    private  List<Recipe> tempRecipeList;
     @OneToMany
-    private final List<Recipe> savedRecipeList;
+    private  List<Recipe> savedRecipeList;
 }
