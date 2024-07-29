@@ -23,5 +23,5 @@ public class Recipe {
     @ElementCollection
     private final List<String> instructions;
     private final Boolean isPrivate;
-
+    private final String usernameRecipe;
 }

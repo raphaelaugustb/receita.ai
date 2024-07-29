@@ -14,10 +14,12 @@ import java.util.UUID;
 @NoArgsConstructor(force = true)
 @AllArgsConstructor
 @Entity
+@Table(name = "user_table")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private final UUID id;
+    @Column(unique = true, nullable = false)
     private final String username;
     private final String password;
     @Column(unique = true, nullable = false)
