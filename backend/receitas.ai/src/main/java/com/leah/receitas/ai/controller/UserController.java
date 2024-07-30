@@ -4,7 +4,6 @@ package com.leah.receitas.ai.controller;
 import com.leah.receitas.ai.dto.user.UserPublicInfo;
 import com.leah.receitas.ai.dto.user.UserRequest;
 import com.leah.receitas.ai.dto.user.UserResponse;
-import com.leah.receitas.ai.entity.User;
 import com.leah.receitas.ai.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,6 +36,7 @@ public class UserController {
         UserPublicInfo userPublicInfo = userService.getUserPublicInfo(username);
         return ResponseEntity.status(HttpStatus.FOUND).body(userPublicInfo);
     }
+
     @GetMapping( "{userId}/account")
     public ResponseEntity<UserResponse> userAccount (@PathVariable UUID userId) {
         UserResponse userResponse = userService.getUserInfo(userId);
