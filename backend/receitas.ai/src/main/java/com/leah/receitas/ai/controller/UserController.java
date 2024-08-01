@@ -46,7 +46,7 @@ public class UserController {
         UserResponse userResponse = userService.getUserInfo(userId);
         return ResponseEntity.status(HttpStatus.FOUND).body(userResponse);
     }
-
+    // Alterar dados da conta do usuário
     @PutMapping("{userId}/account")
     public ResponseEntity<UserResponse> updateUser(@PathVariable UUID userId, @RequestBody UserRequest userRequest) {
         return ResponseEntity.status(HttpStatus.OK).body(userService.updateUser(userId, userRequest));
