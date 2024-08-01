@@ -4,5 +4,5 @@ import com.leah.receitas.ai.entity.Recipe;
 
 import java.util.List;
 
-public record UserResponse(String username, String email, String password, List<Recipe> recipeList,  List<Recipe> savedRecipeList) {
+public record UserResponse(String username, String email, String password, List<Recipe> recipeList,  List<Long> savedRecipeList) {
 }

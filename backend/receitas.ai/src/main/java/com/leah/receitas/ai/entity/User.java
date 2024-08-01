@@ -25,10 +25,10 @@ public class User {
     private  String password;
     @Column(unique = true, nullable = false)
     private  String email;
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     private  List<Recipe> recipeList;
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     private  List<Recipe> tempRecipeList;
-    @OneToMany
-    private  List<Recipe> savedRecipeList;
+    @ElementCollection
+    private  List<Long> savedRecipeList;
 }
