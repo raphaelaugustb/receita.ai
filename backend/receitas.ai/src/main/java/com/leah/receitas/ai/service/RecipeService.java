@@ -38,8 +38,10 @@ public class RecipeService {
         User user = userService.verifyUser(userId);
         for (long id : user.getSavedRecipeList()){
             Recipe recipe = recipeRepository.findById(id).orElse(null);
-            RecipeResponse response = new RecipeResponse(recipe.getRecipeName(), recipe.getIngredients(), recipe.getInstructions(), recipe.getIsPrivate(), recipe.getUsernameRecipe());
-            tempSavedRecipes.add(response);
+            if (recipe != null){
+                RecipeResponse response = new RecipeResponse(recipe.getRecipeName(), recipe.getIngredients(), recipe.getInstructions(), recipe.getIsPrivate(), recipe.getUsernameRecipe());
+                tempSavedRecipes.add(response);
+            }
         }
         return tempSavedRecipes;
     }
@@ -116,7 +118,7 @@ public class RecipeService {
     public void deleteRecipe(UUID userId, long recipeId) {
         User user = userService.verifyUser(userId);
         Recipe recipe = recipeRepository.findById(recipeId).orElse(null);
-        if (recipe == null && recipe.getUsernameRecipe().equalsIgnoreCase(user.getUsername()))
+        if (recipe == null && !(recipe.getUsernameRecipe().equalsIgnoreCase(user.getUsername())))
             throw new RecipeNotFoundException("Recipe not found");
         user.getRecipeList().remove(recipe);
         recipeRepository.deleteById(recipeId);
