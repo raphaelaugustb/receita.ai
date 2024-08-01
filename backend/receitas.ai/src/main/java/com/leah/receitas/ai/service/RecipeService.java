@@ -17,7 +17,6 @@ import java.util.UUID;
 @Service
 public class RecipeService {
     //TODO
-    // Permitir o usuário Salvar receitas de terceiros
     // Implementar IA
     UserService userService;
     UserRepository userRepository;
