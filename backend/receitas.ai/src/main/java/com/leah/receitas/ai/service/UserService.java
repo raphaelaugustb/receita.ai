@@ -9,7 +9,6 @@ import com.leah.receitas.ai.exception.InvalidRequestException;
 import com.leah.receitas.ai.exception.MissingFieldsException;
 import com.leah.receitas.ai.exception.UserNotFoundException;
 import com.leah.receitas.ai.repository.UserRepository;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -19,10 +18,7 @@ import java.util.UUID;
 @Service
 public class UserService {
     //TODO
-    // Implementar métodos CRUD do usuário
-    // Verificar Request com DTO
-    // Listas as listas do usuário pelo nome e permitir que apenas liste a lista publica
-    // Listar o perfil do usuário pelo nome
+    // Implementar segurança e autenticação via JWT
     UserRepository userRepository;
 
     public UserService(UserRepository userRepository) {
