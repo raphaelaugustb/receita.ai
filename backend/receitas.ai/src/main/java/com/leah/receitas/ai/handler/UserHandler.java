@@ -5,12 +5,9 @@ import com.leah.receitas.ai.dto.user.UserRequest;
 import com.leah.receitas.ai.dto.user.UserResponse;
 import com.leah.receitas.ai.exception.UserNotFoundException;
 import com.leah.receitas.ai.service.UserService;
-import jdk.jshell.spi.ExecutionControl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.UUID;
 

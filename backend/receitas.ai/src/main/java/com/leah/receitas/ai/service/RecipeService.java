@@ -41,7 +41,7 @@ public class RecipeService {
         recipe.setUsernameRecipe(user.getUsername());
         recipe.setIsPrivate(recipeRequest.isPrivate());
         recipe.setIngredients(recipeRequest.ingredients());
-        recipe.setInstructions(recipeRequest.instructions());
+        recipe.setInstructions(recipeRequest.instructions()); 
         if (recipe.getRecipeName() == null || recipe.getInstructions() == null || recipe.getIngredients() == null)
             throw new MissingFieldsException("Some of the field are missing");
         return recipe;
