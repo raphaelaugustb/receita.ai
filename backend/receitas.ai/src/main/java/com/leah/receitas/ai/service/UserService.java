@@ -26,10 +26,7 @@ public class UserService {
     }
 
     public User verifyUser(UUID userId) {
-        User user = userRepository.findById(userId).orElse(null);
-        if (user == null)
-            throw new UserNotFoundException("User not Found");
-        return user;
+      return userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found"));
     }
 
     public UserResponse createUser(UserRequest userRequest) {
@@ -61,12 +58,9 @@ public class UserService {
     }
 
     public UserPublicInfo getUserPublicInfo(String username) {
-        User user = userRepository.findByUsername(username);
-        if (user == null)
-            throw new UserNotFoundException("User not Found");
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("User not found"));
         List<Recipe> recipeList = user.getRecipeList().stream().filter(recipe -> !recipe.getIsPrivate()).toList();
         return new UserPublicInfo(username, recipeList);
-
     }
 
     public UserResponse updateUser(UUID userId, UserRequest userRequest) {
