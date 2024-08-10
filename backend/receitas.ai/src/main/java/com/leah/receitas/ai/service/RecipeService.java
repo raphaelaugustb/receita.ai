@@ -132,9 +132,7 @@ public class RecipeService {
 
     public void deleteRecipe(UUID userId, long recipeId) {
         User user = userService.verifyUser(userId);
-        Recipe recipe = recipeRepository.findById(recipeId).orElse(null);
-        if (recipe == null && user.getRecipeList().stream().noneMatch(r -> r.getId() == recipeId))
-            throw new RecipeNotFoundException("Recipe not found");
+        Recipe recipe = recipeRepository.findById(recipeId).orElseThrow(() -> new RecipeNotFoundException("Recipe not found"));
         user.getRecipeList().remove(recipe);
         recipeRepository.deleteById(recipeId);
         userRepository.save(user);
