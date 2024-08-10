@@ -1,5 +1,6 @@
 package com.leah.receitas.ai.service;
 
+import com.leah.receitas.ai.controller.RecipeController;
 import com.leah.receitas.ai.dto.recipe.RecipeRequest;
 import com.leah.receitas.ai.dto.recipe.RecipeResponse;
 import com.leah.receitas.ai.entity.Recipe;
@@ -12,10 +13,12 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
 public class RecipeService {
+    private final RecipeController recipeController;
     //TODO
     // Implementar IA
     UserService userService;
@@ -24,26 +27,29 @@ public class RecipeService {
 
     private Recipe verifyRecipe(long recipeId) {
         Recipe recipe = recipeRepository.findById(recipeId).orElse(null);
-        if (recipe == null && !recipe.getIsPrivate())
-            throw new RecipeNotFoundException("Recipe not found");
+        if (recipe == null && !recipe.getIsPrivate()) throw new RecipeNotFoundException("Recipe not found");
         return recipe;
     }
 
-    public RecipeService(UserService userService, UserRepository userRepository, RecipeRepository recipeRepository) {
+    public RecipeService(UserService userService, UserRepository userRepository, RecipeRepository recipeRepository, RecipeController recipeController) {
         this.userService = userService;
         this.userRepository = userRepository;
         this.recipeRepository = recipeRepository;
+        this.recipeController = recipeController;
     }
-
+    private RecipeRequest verifyRecipeRequest(RecipeRequest recipeRequest) {
+        if(recipeRequest.recipeName() == null || recipeRequest.instructions() == null || recipeRequest.ingredients() == null || recipeRequest.isPrivate() == null)
+            throw new MissingFieldsException("Missing required fields");
+        return recipeRequest;
+    }
     private Recipe createNewRecipeFromRequest(RecipeRequest recipeRequest, User user) {
         Recipe recipe = new Recipe();
-        recipe.setRecipeName(recipeRequest.recipeName());
+        RecipeRequest verifyRecipeRequest = verifyRecipeRequest(recipeRequest);
+        recipe.setRecipeName(verifyRecipeRequest.recipeName());
         recipe.setUsernameRecipe(user.getUsername());
-        recipe.setIsPrivate(recipeRequest.isPrivate());
-        recipe.setIngredients(recipeRequest.ingredients());
-        recipe.setInstructions(recipeRequest.instructions()); 
-        if (recipe.getRecipeName() == null || recipe.getInstructions() == null || recipe.getIngredients() == null)
-            throw new MissingFieldsException("Some of the field are missing");
+        recipe.setIsPrivate(verifyRecipeRequest.isPrivate());
+        recipe.setIngredients(verifyRecipeRequest.ingredients());
+        recipe.setInstructions(verifyRecipeRequest.instructions());
         return recipe;
     }
 
@@ -57,7 +63,7 @@ public class RecipeService {
         List<RecipeResponse> tempSavedRecipes = new ArrayList<>();
         User user = userService.verifyUser(userId);
         for (long id : user.getSavedRecipeList()) {
-            Recipe recipe = recipeRepository.findById(id).orElse(null);
+            Recipe recipe = recipeRepository.findById(id).orElseThrow(() -> new RecipeNotFoundException("Recipe not found"));
             if (recipe != null) {
                 RecipeResponse response = new RecipeResponse(recipe.getRecipeName(), recipe.getIngredients(), recipe.getInstructions(), recipe.getIsPrivate(), recipe.getUsernameRecipe());
                 tempSavedRecipes.add(response);
@@ -99,18 +105,18 @@ public class RecipeService {
 
     public RecipeResponse updateRecipeInfo(UUID userId, long recipeId, RecipeRequest recipeRequest) {
         User user = userService.verifyUser(userId);
-        Recipe newRecipe = createNewRecipeFromRequest(recipeRequest, user);
-        for (Recipe recipe : user.getRecipeList()) {
-            if (recipe.getId() == recipeId) {
-                recipe.setIngredients(newRecipe.getIngredients());
-                recipe.setInstructions(newRecipe.getInstructions());
-                recipe.setIsPrivate(newRecipe.getIsPrivate());
-                recipe.setRecipeName(newRecipe.getRecipeName());
-                recipeRepository.save(recipe);
-                userRepository.save(user);
-                break;
-            }
-        }
+        RecipeRequest verifyRecipe = verifyRecipeRequest(recipeRequest);
+        Recipe recipe = recipeRepository.findById(recipeId).orElseThrow(() -> new RecipeNotFoundException("Recipe not found"));
+        user.getRecipeList().remove(recipe);
+        recipe.setIngredients(verifyRecipe.ingredients());
+        recipe.setInstructions(verifyRecipe.instructions());
+        recipe.setIsPrivate(verifyRecipe.isPrivate());
+        recipe.setRecipeName(verifyRecipe.recipeName());
+        recipeRepository.save(recipe);
+        user.getRecipeList().add(recipe);
+
+        userRepository.save(user);
+
         return new RecipeResponse(recipeRequest.recipeName(), recipeRequest.ingredients(), recipeRequest.instructions(), recipeRequest.isPrivate(), user.getUsername());
     }
 
