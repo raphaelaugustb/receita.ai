@@ -7,13 +7,13 @@ import com.leah.receitas.ai.entity.Recipe;
 import com.leah.receitas.ai.entity.User;
 import com.leah.receitas.ai.exception.MissingFieldsException;
 import com.leah.receitas.ai.exception.RecipeNotFoundException;
+import com.leah.receitas.ai.exception.UserNotFoundException;
 import com.leah.receitas.ai.repository.RecipeRepository;
 import com.leah.receitas.ai.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -53,7 +53,7 @@ public class RecipeService {
         return recipe;
     }
 
-    public void removeRecipeSaved(UUID userId, long recipeId) {
+    public void deleteSavedRecipe(UUID userId, long recipeId) {
         User user = userService.verifyUser(userId);
         user.getSavedRecipeList().removeIf(id -> id == recipeId);
         userRepository.save(user);
@@ -63,23 +63,28 @@ public class RecipeService {
         List<RecipeResponse> tempSavedRecipes = new ArrayList<>();
         User user = userService.verifyUser(userId);
         for (long id : user.getSavedRecipeList()) {
-            Recipe recipe = recipeRepository.findById(id).orElseThrow(() -> new RecipeNotFoundException("Recipe not found"));
+            Recipe recipe = recipeRepository.findById(id).orElse(null);
             if (recipe != null) {
                 RecipeResponse response = new RecipeResponse(recipe.getRecipeName(), recipe.getIngredients(), recipe.getInstructions(), recipe.getIsPrivate(), recipe.getUsernameRecipe());
                 tempSavedRecipes.add(response);
+            } else {
+                user.getSavedRecipeList().remove(recipe.getId());
+                userRepository.save(user);
             }
         }
-        return tempSavedRecipes;
+        if (tempSavedRecipes.isEmpty())
+            throw new RecipeNotFoundException("None recipes on saved list");
+       return tempSavedRecipes;
     }
 
-    public void saveRecipeFromUsers(UUID userId, long recipeId) {
+    public void saveRecipeFromAnotherUser(UUID userId, long recipeId) {
         User user = userService.verifyUser(userId);
         Recipe recipe = verifyRecipe(recipeId);
         user.getSavedRecipeList().add(recipe.getId());
         userRepository.save(user);
     }
 
-    public List<RecipeResponse> getRecipesByNamePublic(String recipeName) {
+    public List<RecipeResponse> queryRecipesByName(String recipeName) {
         List<Recipe> recipeList = recipeRepository.findByRecipeName(recipeName);
         List<RecipeResponse> recipeResponseList = new ArrayList<>();
         recipeList.stream().filter(recipe -> !recipe.getIsPrivate()).toList().forEach(recipe -> {
@@ -91,8 +96,8 @@ public class RecipeService {
         return recipeResponseList;
     }
 
-    public List<RecipeResponse> getUserRecipesByName(UUID userId, String recipeName) {
-        User user = userService.verifyUser(userId);
+    public List<RecipeResponse> queryRecipesOnUserList(String username, String recipeName) {
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("User not found"));
         List<RecipeResponse> recipeResponseList = new ArrayList<>();
         user.getRecipeList().stream().filter(recipe -> recipe.getRecipeName().equalsIgnoreCase(recipeName)).toList().forEach(recipe -> {
             RecipeResponse recipeResponse = new RecipeResponse(recipe.getRecipeName(), recipe.getInstructions(), recipe.getIngredients(), recipe.getIsPrivate(), recipe.getUsernameRecipe());
@@ -122,11 +127,13 @@ public class RecipeService {
 
     public RecipeResponse createRecipe(RecipeRequest recipeRequest, UUID userId) {
         User user = userService.verifyUser(userId);
-        Recipe recipe = createNewRecipeFromRequest(recipeRequest, user);
+        RecipeRequest verifyRecipeRequest = verifyRecipeRequest(recipeRequest);
+        Recipe recipe = createNewRecipeFromRequest(verifyRecipeRequest, user);
+
         recipeRepository.save(recipe);
         user.getRecipeList().add(recipe);
         userRepository.save(user);
-        return new RecipeResponse(recipeRequest.recipeName(), recipeRequest.ingredients(), recipeRequest.instructions(), recipeRequest.isPrivate(), user.getUsername());
+        return new RecipeResponse(verifyRecipeRequest.recipeName(), verifyRecipeRequest.ingredients(), verifyRecipeRequest.instructions(), verifyRecipeRequest.isPrivate(), user.getUsername());
     }
 
 
