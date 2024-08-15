@@ -1,11 +1,10 @@
 package com.leah.receitas.ai.service;
 
-import com.leah.receitas.ai.controller.RecipeController;
 import com.leah.receitas.ai.dto.recipe.RecipeRequest;
 import com.leah.receitas.ai.dto.recipe.RecipeResponse;
 import com.leah.receitas.ai.entity.Recipe;
 import com.leah.receitas.ai.entity.User;
-import com.leah.receitas.ai.exception.MissingFieldsException;
+import com.leah.receitas.ai.exception.InvalidRequestException;
 import com.leah.receitas.ai.exception.RecipeNotFoundException;
 import com.leah.receitas.ai.exception.UserNotFoundException;
 import com.leah.receitas.ai.repository.RecipeRepository;
@@ -37,7 +36,7 @@ public class RecipeService {
     }
     private RecipeRequest verifyRecipeRequest(RecipeRequest recipeRequest) {
         if(recipeRequest.recipeName() == null || recipeRequest.instructions() == null || recipeRequest.ingredients() == null || recipeRequest.isPrivate() == null)
-            throw new MissingFieldsException("Missing required fields");
+            throw new InvalidRequestException("Missing required fields");
         return recipeRequest;
     }
     private Recipe createNewRecipeFromRequest(RecipeRequest recipeRequest, User user) {
