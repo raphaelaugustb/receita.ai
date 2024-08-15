@@ -18,7 +18,6 @@ import java.util.UUID;
 
 @Service
 public class RecipeService {
-    private final RecipeController recipeController;
     //TODO
     // Implementar IA
     UserService userService;
@@ -31,11 +30,10 @@ public class RecipeService {
         return recipe;
     }
 
-    public RecipeService(UserService userService, UserRepository userRepository, RecipeRepository recipeRepository, RecipeController recipeController) {
+    public RecipeService(UserService userService, UserRepository userRepository, RecipeRepository recipeRepository) {
         this.userService = userService;
         this.userRepository = userRepository;
         this.recipeRepository = recipeRepository;
-        this.recipeController = recipeController;
     }
     private RecipeRequest verifyRecipeRequest(RecipeRequest recipeRequest) {
         if(recipeRequest.recipeName() == null || recipeRequest.instructions() == null || recipeRequest.ingredients() == null || recipeRequest.isPrivate() == null)
