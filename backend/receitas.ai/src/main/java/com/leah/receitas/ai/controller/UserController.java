@@ -14,38 +14,38 @@ import java.util.UUID;
 
 @RestController
 public class UserController {
-    UserHandler userHandler;
+     UserService userService;
 
-    public UserController(UserHandler userHandler) {
-        this.userHandler = userHandler;
+    public UserController(UserService userService) {
+        this.userService = userService;
     }
 
     //Criar um novo usuário
     @PostMapping("/register")
     public ResponseEntity<UserResponse> registerNewUser(@RequestBody UserRequest userRequest) {
-        return userHandler.createUserHandler(userRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(userRequest));
     }
 
     // Deletar a conta de um usuário
     @DeleteMapping("{userId}/account")
-    public ResponseEntity<String> deleteUserAccount(@PathVariable UUID userId) {
-        return userHandler.deleteAccountHandler(userId);
+    public ResponseEntity<Void> deleteUserAccount(@PathVariable UUID userId) {
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     //Receber os dados públicos do usuário (Receitas que são públicas e o seu nome)
     @GetMapping("{username}/profile")
     public ResponseEntity<UserPublicInfo> getUserPublicInfo(@PathVariable String username) {
-        return  userHandler.getPublicInfoHandler(username);
+        return ResponseEntity.status(HttpStatus.FOUND).body(userService.getUserPublicInfo(username));
     }
 
     //Receber todos os dados do usuário
     @GetMapping( "{userId}/account")
     public ResponseEntity<UserResponse> getUserPrivateInfo (@PathVariable UUID userId) {
-        return userHandler.getPrivateInfoHandler(userId);
+        return ResponseEntity.status(HttpStatus.FOUND).body(userService.getUserInfo(userId));
     }
     // Alterar dados da conta do usuário
     @PutMapping("{userId}/account")
     public ResponseEntity<UserResponse> updateUserInfo(@PathVariable UUID userId, @RequestBody UserRequest userRequest) {
-        return userHandler.updateUserInfoHandler(userId, userRequest);
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(userService.updateUser(userId, userRequest));
     }
 }
